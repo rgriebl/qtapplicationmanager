@@ -108,8 +108,9 @@ jobs:
       if: (startsWith(matrix.config.os, 'ubuntu'))
       continue-on-error: true
       run: |
+        sudo apt-get install xvfb
         cd am
-        sudo -E make check
+        sudo -E xvfb-run --auto-servernum make check || true
         for i in $(find am -name xunit.xml); do echo "File $i"; cat $i; echo "-------------"; echo; done
       shell: bash
   
