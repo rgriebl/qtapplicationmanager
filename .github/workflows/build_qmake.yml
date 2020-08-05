@@ -60,6 +60,10 @@ jobs:
           qt_arch: ''
 
     steps:
+    - name: Build on Windows
+      run: |
+        echo "$TESTARGS"
+        
     - name: Install OpenSSL on Windows
       if: startsWith(matrix.config.os, 'windows')
       run: |
