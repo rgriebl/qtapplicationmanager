@@ -72,7 +72,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.config.qt_version }}
-        modules: 'qtscript qtscripttools qtsvg qttools'
+        modules: 'qtsvg qttools'
         arch: ${{ matrix.config.qt_arch }}
 
     - name: Build on Windows
@@ -80,7 +80,7 @@ jobs:
       run: |
         call "${{ matrix.config.environment_script }}"
         cd qtapplicationmanager
-        qmake CONFIG+=release
+        qmake -config release -config enable-examples -config enable-tests
         nmake
         nmake check
       shell: cmd
@@ -88,17 +88,18 @@ jobs:
     - name: Build on Linux
       if: (startsWith(matrix.config.os, 'ubuntu'))
       run: |
+        sudo apt install libwayland-dev libwayland-bin
         cd qtapplicationmanager
-        qmake CONFIG+=release
+        qmake -config release -config enable-examples -config enable-tests
         make
-        make check
+        sudo make check
       shell: bash
 
     - name: Build on macOS
       if: (startsWith(matrix.config.os, 'mac'))
       run: |
         cd qtapplicationmanager
-        qmake CONFIG+=release
+        qmake -config release -config enable-examples -config enable-tests
         make
         make check
       shell: bash
