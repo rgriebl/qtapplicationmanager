@@ -66,7 +66,7 @@ jobs:
 
     - name: Checkout QtApplicationManager
       run: |
-          git clone https://code.qt.io/git/qt/qtapplicationmanager.git --branch ${{ matrix.config.am_version }} .
+          git clone https://code.qt.io/git/qt/qtapplicationmanager.git --branch ${{ matrix.config.am_version }}
 
     - name: Install Qt from qt.io
       uses: jurplel/install-qt-action@v2
@@ -79,6 +79,7 @@ jobs:
       if: startsWith(matrix.config.os, 'windows')
       run: |
         call "${{ matrix.config.environment_script }}"
+        cd qtapplicationmanager
         qmake CONFIG+=release
         nmake
         nmake check
@@ -87,6 +88,7 @@ jobs:
     - name: Build on Linux
       if: (startsWith(matrix.config.os, 'ubuntu'))
       run: |
+        cd qtapplicationmanager
         qmake CONFIG+=release
         make
         make check
@@ -95,6 +97,7 @@ jobs:
     - name: Build on macOS
       if: (startsWith(matrix.config.os, 'mac'))
       run: |
+        cd qtapplicationmanager
         qmake CONFIG+=release
         make
         make check
