@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  TESTARGS: "-o txt,- -o junitxml,junit.xml"
+  TESTARGS: "-o -,txt -o xunit.xml,xunitxml"
 
 jobs:
   build:
@@ -59,11 +59,7 @@ jobs:
           qt_version: 5.15.0
           qt_arch: ''
 
-    steps:
-    - name: Build on Windows
-      run: |
-        echo "$TESTARGS"
-        
+    steps:       
     - name: Install OpenSSL on Windows
       if: startsWith(matrix.config.os, 'windows')
       run: |
@@ -84,37 +80,51 @@ jobs:
 
     - name: Build on Windows
       if: startsWith(matrix.config.os, 'windows')
-      continue-on-error: true
       run: |
         call "${{ matrix.config.environment_script }}"
         cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         nmake
+
+    - name: Run Tests on Windows
+      if: startsWith(matrix.config.os, 'windows')
+      continue-on-error: true
+      run: |
+        call "${{ matrix.config.environment_script }}"
+        cd am
         nmake check
-      shell: cmd
 
     - name: Build on Linux
       if: (startsWith(matrix.config.os, 'ubuntu'))
-      continue-on-error: true
       run: |
         sudo apt install libwayland-dev libwayland-bin libxkbcommon-dev
         cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         make
-        sudo make check
-      shell: bash
 
+    - name: Run Tests on Linux
+      if: (startsWith(matrix.config.os, 'ubuntu'))
+      continue-on-error: true
+      run: |
+        cd am
+        sudo -E make check
+  
     - name: Build on macOS
       if: (startsWith(matrix.config.os, 'mac'))
-      continue-on-error: true
       run: |
         cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         make
-        make check
-      shell: bash
 
-    - uses: IgnusG/jest-report-action@v2.3.3
+    - name: Run Tests on macOS
+      if: (startsWith(matrix.config.os, 'mac'))
+      continue-on-error: true
+      run: |
+        cd am
+        make check
+
+    - name: Publish Test Report
+      uses: scacap/action-surefire-report@v1
       with:
-        working-directory: am
-        access-token: ${{ secrets.GITHUB_TOKEN }}
+        report_paths: am/**/xunit.xml
+        github_token: ${{ secrets.GITHUB_TOKEN }}
