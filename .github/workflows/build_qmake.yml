@@ -113,7 +113,7 @@ jobs:
         make check
       shell: bash
 
-    - uses: IgnusG/jest-report-action@v2
+    - uses: IgnusG/jest-report-action@v2.3.3
       with:
         working-directory: am
         access-token: ${{ secrets.GITHUB_TOKEN }}
