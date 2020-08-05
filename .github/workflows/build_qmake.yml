@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  TESTARGS: "-o txt,- -o junitxml,junit.xml"
+
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -78,8 +81,6 @@ jobs:
     - name: Build on Windows
       if: startsWith(matrix.config.os, 'windows')
       continue-on-error: true
-      env:
-        TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
         call "${{ matrix.config.environment_script }}"
         cd am
@@ -91,8 +92,6 @@ jobs:
     - name: Build on Linux
       if: (startsWith(matrix.config.os, 'ubuntu'))
       continue-on-error: true
-      env:
-        TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
         sudo apt install libwayland-dev libwayland-bin libxkbcommon-dev
         cd am
@@ -104,8 +103,6 @@ jobs:
     - name: Build on macOS
       if: (startsWith(matrix.config.os, 'mac'))
       continue-on-error: true
-      env:
-        TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
         cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
