@@ -17,7 +17,7 @@ jobs:
           os: windows-latest
           am_version: 5.12
           qt_version: 5.12.9
-          qt_arch: 'win32_msvc2019'
+          qt_arch: 'win32_msvc2017'
           environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars32.bat"
           
         - name: "Ubuntu 20.04 64bit"
@@ -80,7 +80,7 @@ jobs:
       run: |
         call "${{ matrix.config.environment_script }}"
         cd qtapplicationmanager
-        qmake -config release -config enable-examples -config enable-tests
+        qmake -config silent -config release -config enable-examples -config enable-tests
         nmake
         nmake check
       shell: cmd
@@ -88,9 +88,9 @@ jobs:
     - name: Build on Linux
       if: (startsWith(matrix.config.os, 'ubuntu'))
       run: |
-        sudo apt install libwayland-dev libwayland-bin
+        sudo apt install libwayland-dev libwayland-bin libxkbcommon-dev
         cd qtapplicationmanager
-        qmake -config release -config enable-examples -config enable-tests
+        qmake -config silent -config release -config enable-examples -config enable-tests
         make
         sudo make check
       shell: bash
@@ -99,7 +99,7 @@ jobs:
       if: (startsWith(matrix.config.os, 'mac'))
       run: |
         cd qtapplicationmanager
-        qmake -config release -config enable-examples -config enable-tests
+        qmake -config silent -config release -config enable-examples -config enable-tests
         make
         make check
       shell: bash
