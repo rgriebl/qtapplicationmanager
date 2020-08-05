@@ -65,10 +65,8 @@ jobs:
       shell: cmd
 
     - name: Checkout QtApplicationManager
-      uses: actions/checkout@v2
-      with:
-        repository: https://code.qt.io/git/qt/qtapplicationmanager.git
-        ref: ${{ matrix.config.am_version }}
+      run: |
+          git clone https://code.qt.io/git/qt/qtapplicationmanager.git --branch ${{ matrix.config.am_version }}
 
     - name: Install Qt from qt.io
       uses: jurplel/install-qt-action@v2
