@@ -1,0 +1,101 @@
+name: QtApplicationManager Build Matrix
+
+on: [ push ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: "Windows 32bit",
+          artifact: "Windows-x86.exe",
+          os: windows-latest,
+          am_version: 5.12
+          qt_version: 5.12.9,
+          qt_arch: 'win32_msvc2019',
+          environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars32.bat"
+          
+        - name: "Ubuntu 20.04 64bit",
+          artifact: "Ubuntu-20.04-amd64.deb",
+          os: ubuntu-20.04,
+          am_version: 5.12
+          qt_version: 5.12.9
+          qt_arch: ''
+          
+        - name: "macOS 64bit",
+          artifact: "macOS.dmg",
+          os: macos-latest,
+          am_version: 5.12
+          qt_version: 5.12.9
+          qt_arch: ''
+
+        - name: "Windows 32bit",
+          artifact: "Windows-x86.exe",
+          os: windows-latest,
+          am_version: 5.15
+          qt_version: 5.15.0,
+          qt_arch: 'win32_msvc2019',
+          environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars32.bat"
+          
+        - name: "Ubuntu 20.04 64bit",
+          artifact: "Ubuntu-20.04-amd64.deb",
+          os: ubuntu-20.04,
+          am_version: 5.15
+          qt_version: 5.15.0
+          qt_arch: ''
+          
+        - name: "macOS 64bit",
+          artifact: "macOS.dmg",
+          os: macos-latest,
+          am_version: 5.15
+          qt_version: 5.15.0
+          qt_arch: ''
+
+    steps:
+    - name: Install OpenSSL on Windows
+      if: startsWith(matrix.config.os, 'windows')
+      run: |
+        curl.exe --output openssl.msi "https://slproweb.com/download/Win32OpenSSL_Light-1_1_1g.msi"
+        msiexec /i openssl.msi /quiet /qn /norestart
+      shell: cmd
+
+    - name: Checkout QtApplicationManager
+      uses: actions/checkout@v2
+      with:
+        repository: https://code.qt.io/git/qt/qtapplicationmanager.git
+        ref: ${{ matrix.config.am_version }}
+
+    - name: Install Qt from qt.io
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.config.qt_version }}
+        modules: 'qtscript qtscripttools qtsvg qttools'
+        arch: ${{ matrix.config.qt_arch }}
+
+    - name: Build on Windows
+      if: startsWith(matrix.config.os, 'windows')
+      run: |
+        call "${{ matrix.config.environment_script }}"
+        qmake CONFIG+=release
+        nmake
+        nmake check
+      shell: cmd
+
+    - name: Build on Linux
+      if: (startsWith(matrix.config.os, 'ubuntu'))
+      run: |
+        qmake CONFIG+=release
+        make
+        make check
+      shell: bash
+
+    - name: Build on macOS
+      if: (startsWith(matrix.config.os, 'mac'))
+      run: |
+        qmake CONFIG+=release
+        make
+        make check
+      shell: bash
