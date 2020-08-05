@@ -66,7 +66,7 @@ jobs:
 
     - name: Checkout QtApplicationManager
       run: |
-          git clone https://code.qt.io/git/qt/qtapplicationmanager.git --branch ${{ matrix.config.am_version }}
+          git clone https://code.qt.io/git/qt/qtapplicationmanager.git --branch ${{ matrix.config.am_version }} am
 
     - name: Install Qt from qt.io
       uses: jurplel/install-qt-action@v2
@@ -82,7 +82,7 @@ jobs:
         TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
         call "${{ matrix.config.environment_script }}"
-        cd qtapplicationmanager
+        cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         nmake
         nmake check
@@ -95,7 +95,7 @@ jobs:
         TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
         sudo apt install libwayland-dev libwayland-bin libxkbcommon-dev
-        cd qtapplicationmanager
+        cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         make
         sudo make check
@@ -107,13 +107,13 @@ jobs:
       env:
         TESTARGS: -o txt,- -o junitxml,junit.xml 
       run: |
-        cd qtapplicationmanager
+        cd am
         qmake -config silent -config release -config enable-examples -config enable-tests
         make
         make check
       shell: bash
 
     - uses: IgnusG/jest-report-action@v2
-      if: always() # Or use "" in previous test step
       with:
+        working-directory: am
         access-token: ${{ secrets.GITHUB_TOKEN }}
