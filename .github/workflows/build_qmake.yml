@@ -110,7 +110,7 @@ jobs:
       run: |
         sudo apt-get install xvfb
         cd am
-        sudo -E xvfb-run --auto-servernum make check || true
+        xvfb-run --auto-servernum sudo -E make check || true
         for i in $(find . -name xunit.xml); do echo "File $i"; cat $i; echo "-------------"; echo; done
       shell: bash
   
