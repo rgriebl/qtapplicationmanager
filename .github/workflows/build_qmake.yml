@@ -113,7 +113,7 @@ jobs:
         make check
       shell: bash
 
-    - uses: IgnusG/jest-report-action@v{ current version }
+    - uses: IgnusG/jest-report-action@v2
       if: always() # Or use "" in previous test step
       with:
         access-token: ${{ secrets.GITHUB_TOKEN }}
